@@ -22,7 +22,7 @@ from crypto_automation.jobs import Job, run_jobs
 from crypto_automation.report import event, markdown_report, to_csv, to_json
 from crypto_automation.vault import create_vault, delete_key, get_key, list_keys, put_key
 
-st.set_page_config(page_title="Cryptographic Automation", page_icon="🔐", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Cryptographic Automation", page_icon="CA", layout="wide", initial_sidebar_state="expanded")
 
 CSS = """
 <style>
@@ -70,7 +70,7 @@ init_state()
 
 st.markdown("""
 <div class="hero">
-<h1>🔐 Cryptographic Automation</h1>
+<h1>Cryptographic Automation</h1>
 <p>Secure • Detect • Encrypt • Verify • Automate • Report</p>
 <span class="badge">AES-256-GCM</span><span class="badge">Ed25519</span><span class="badge">SHA-256 / SHA-512</span><span class="badge">HMAC-SHA256</span><span class="badge">Local-first</span>
 <p class="small">A professional cryptographic workbench for repeatable defensive workflows. Cryptographic primitives come from the established Python cryptography library; the application does not invent its own algorithms.</p>
@@ -171,7 +171,7 @@ with tabs[2]:
                     download("Download recovered artifact", plaintext, name)
                     st.success("Authentication passed and plaintext was recovered.")
                     audit("decrypt", uploaded.name)
-                except Exception as exc:
+                except Exception:
                     audit("decrypt", f"{uploaded.name}: authentication/decryption failed", "failed")
                     st.error("Decryption failed. The key, container or authentication tag may be invalid.")
 
@@ -259,7 +259,7 @@ with tabs[5]:
         if st.button("List vault keys", use_container_width=True):
             try:
                 st.json(list_keys(vault_path, vault_password))
-            except Exception as exc:
+            except Exception:
                 st.error("Vault could not be opened. Check the path and password.")
     with v3:
         if st.button("Delete selected key", use_container_width=True):
