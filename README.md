@@ -2,7 +2,7 @@
 
 ## Download and install on Windows, macOS, and Linux
 
-AutoCrypt is currently distributed as source code; this repository does not yet publish native EXE, DMG, or Linux installer packages.
+AutoCrypt's source code remains available on all platforms. A Windows desktop installer build workflow is now included; the installer is published as a workflow artifact when the build succeeds, and as a GitHub Release asset when a version tag is pushed.
 
 ### 1. Download the source
 
@@ -275,3 +275,35 @@ AutoCrypt is intended for legitimate cryptographic automation, education, develo
 ## License
 
 MIT
+
+
+## Windows desktop installer (Windows 10/11)
+
+The repository includes a Windows desktop launcher and a GitHub Actions workflow that packages AutoCrypt with a native window and a bundled Streamlit server.
+
+### Build the installer from GitHub
+
+1. Open [Build AutoCrypt Windows Installer](https://github.com/meubaidkaleem-glitch/cryptographic-automation/actions/workflows/build-windows-installer.yml).
+2. Select **Run workflow** and run it on the `main` branch.
+3. Open the completed workflow run and download the **AutoCrypt-Windows-Installer** artifact.
+4. Extract the artifact ZIP and run `AutoCrypt-Setup-Windows-x64.exe`.
+
+The workflow also builds and attaches the installer to a GitHub Release when a version tag (for example, `v0.3.1`) is pushed. The installer build has to complete successfully before a downloadable installer exists; this repository update itself does not mean a tested installer has already been produced.
+
+### Local build prerequisites
+
+- Windows 10/11 x64
+- Python 3.11
+- Microsoft Edge WebView2 Runtime (usually present on current Windows 10/11 installations)
+- Inno Setup 6
+
+Run from the repository root in PowerShell:
+
+```powershell
+python -m pip install -e .
+python -m pip install -r requirements-desktop.txt
+python -m PyInstaller --noconfirm --clean --onedir --windowed --name AutoCrypt --collect-all webview desktop_launcher.py
+python -m PyInstaller --noconfirm --clean --onedir --console --name AutoCryptServer --collect-all streamlit --collect-all cryptography --hidden-import=crypto_automation --hidden-import=crypto_automation.crypto --hidden-import=crypto_automation.detect --hidden-import=crypto_automation.jobs --hidden-import=crypto_automation.report --hidden-import=crypto_automation.vault --add-data "crypto_automation;crypto_automation" streamlit_server.py
+```
+
+The GitHub Actions workflow performs the remaining packaging and installer steps.
