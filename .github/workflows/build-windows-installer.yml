@@ -29,18 +29,20 @@ jobs:
           python -m pip install -e .
           python -m pip install -r requirements-desktop.txt
 
-      - name: Build AutoCrypt desktop bundle
+      - name: Build native desktop window
         shell: pwsh
         run: |
-          python -m PyInstaller --noconfirm --clean --onedir --windowed --name AutoCrypt --collect-all streamlit --collect-all cryptography --collect-all webview --hidden-import=crypto_automation --hidden-import=crypto_automation.crypto --hidden-import=crypto_automation.detect --hidden-import=crypto_automation.jobs --hidden-import=crypto_automation.report --hidden-import=crypto_automation.vault --add-data "app.py;." --add-data "crypto_automation;crypto_automation" desktop_launcher.py
+          python -m PyInstaller --noconfirm --clean --onedir --windowed --name AutoCrypt --collect-all webview desktop_launcher.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Include Python runtime for Streamlit subprocess
+      - name: Build bundled Streamlit server
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force dist/AutoCrypt/runtime | Out-Null
-          Copy-Item (Join-Path (Split-Path (Get-Command python).Source) "python.exe") dist/AutoCrypt/runtime/python.exe
-          $site = python -c "import site; print(site.getsitepackages()[0])"
-          Copy-Item $site dist/AutoCrypt/runtime/site-packages -Recurse
+          python -m PyInstaller --noconfirm --clean --onedir --console --name AutoCryptServer --collect-all streamlit --collect-all cryptography --hidden-import=crypto_automation --hidden-import=crypto_automation.crypto --hidden-import=crypto_automation.detect --hidden-import=crypto_automation.jobs --hidden-import=crypto_automation.report --hidden-import=crypto_automation.vault --add-data "crypto_automation;crypto_automation" streamlit_server.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force dist/AutoCrypt/server | Out-Null
+          Copy-Item dist/AutoCryptServer/* dist/AutoCrypt/server -Recurse -Force
+          Copy-Item app.py dist/AutoCrypt/app.py
 
       - name: Install Inno Setup
         shell: pwsh
