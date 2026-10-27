@@ -5,9 +5,7 @@ from pathlib import Path
 import webview
 
 def app_root() -> Path:
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent
+    return Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
 
 def free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -16,14 +14,6 @@ def free_port() -> int:
 
 def main() -> None:
     root = app_root()
-    app_file = root / "app.py"
-    if not app_file.exists():
-        import tkinter as tk
-        from tkinter import messagebox
-        window = tk.Tk()
-        window.withdraw()
-        messagebox.showerror("AutoCrypt", f"Could not find app.py in:\n{root}")
-        return
     port = free_port()
     url = f"http://127.0.0.1:{port}"
     env = os.environ.copy()
@@ -36,17 +26,19 @@ def main() -> None:
         "STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION": "true",
         "PYTHONUTF8": "1",
     })
-    # The release workflow includes the Python runtime separately so the
-    # Streamlit server can run while this executable hosts the desktop window.
     if getattr(sys, "frozen", False):
-        python = root / "runtime" / "python.exe"
-        command = [str(python), "-m", "streamlit", "run", str(app_file),
-                   "--server.address=127.0.0.1", f"--server.port={port}",
-                   "--server.headless=true", "--browser.gatherUsageStats=false"]
+        server = root / "server" / "AutoCryptServer.exe"
+        app_file = root / "app.py"
+        command = [str(server), str(app_file), str(port)]
     else:
-        command = [sys.executable, "-m", "streamlit", "run", str(app_file),
-                   "--server.address=127.0.0.1", f"--server.port={port}",
-                   "--server.headless=true", "--browser.gatherUsageStats=false"]
+        command = [sys.executable, str(root / "streamlit_server.py"), str(root / "app.py"), str(port)]
+    if not Path(command[0]).exists():
+        import tkinter as tk
+        from tkinter import messagebox
+        window = tk.Tk()
+        window.withdraw()
+        messagebox.showerror("AutoCrypt", f"Could not find the bundled server:\n{command[0]}")
+        return
     process = subprocess.Popen(command, cwd=str(root), env=env, stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL,
                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
