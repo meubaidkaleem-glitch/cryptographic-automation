@@ -48,6 +48,49 @@ jobs:
           Copy-Item dist/AutoCryptServer/* dist/AutoCrypt/server -Recurse -Force
           Copy-Item app.py dist/AutoCrypt/app.py
 
+      - name: Smoke-test bundled Streamlit server
+        shell: pwsh
+        run: |
+          $appRoot = (Resolve-Path "dist/AutoCrypt").Path
+          $serverExe = Join-Path $appRoot "server/AutoCryptServer.exe"
+          $appPath = Join-Path $appRoot "app.py"
+          $port = 18673
+          $stdout = Join-Path $env:RUNNER_TEMP "autocrypt-server.stdout.log"
+          $stderr = Join-Path $env:RUNNER_TEMP "autocrypt-server.stderr.log"
+          $process = Start-Process -FilePath $serverExe -ArgumentList @($appPath, "$port") -WorkingDirectory $appRoot -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 60; $i++) {
+              if ($process.HasExited) { break }
+              try {
+                $response = Invoke-WebRequest -Uri "http://127.0.0.1:$port/_stcore/health" -TimeoutSec 2 -UseBasicParsing
+                if ($response.StatusCode -eq 200 -and $response.Content.Trim() -eq "ok") {
+                  $ready = $true
+                  break
+                }
+              } catch {}
+              Start-Sleep -Seconds 1
+            }
+            if (-not $ready) {
+              Write-Host "----- server stdout -----"
+              if (Test-Path $stdout) { Get-Content $stdout }
+              Write-Host "----- server stderr -----"
+              if (Test-Path $stderr) { Get-Content $stderr }
+              throw "Bundled Streamlit server did not become healthy within 60 seconds."
+            }
+            Start-Sleep -Seconds 3
+            $logs = ""
+            if (Test-Path $stdout) { $logs += Get-Content $stdout -Raw }
+            if (Test-Path $stderr) { $logs += Get-Content $stderr -Raw }
+            if ($logs -match "(?i)ModuleNotFoundError|ImportError|Traceback \(most recent call last\)") {
+              Write-Host $logs
+              throw "Python import/runtime error detected in bundled server logs."
+            }
+            Write-Host "Bundled Streamlit server passed the HTTP health check."
+          } finally {
+            if ($null -ne $process -and -not $process.HasExited) { Stop-Process -Id $process.Id -Force }
+          }
+
       - name: Install Inno Setup
         shell: pwsh
         run: choco install innosetup --yes --no-progress
