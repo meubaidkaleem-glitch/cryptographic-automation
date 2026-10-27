@@ -3,6 +3,8 @@ name: Build AutoCrypt Windows Installer
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "main"
     tags:
       - "v*"
 
