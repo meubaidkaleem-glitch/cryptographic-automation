@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cryptographic-automation"
+version = "0.1.0"
+description = "Security-focused automation for common cryptographic workflows"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "cryptography>=43,<48",
+  "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+crypto-auto = "crypto_automation.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
