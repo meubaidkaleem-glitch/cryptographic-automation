@@ -11,6 +11,7 @@ def run() -> None:
     port = str(sys.argv[2])
     sys.argv = ["streamlit", "run", app_path, "--server.address=127.0.0.1",
                 f"--server.port={port}", "--server.headless=true",
+                "--global.developmentMode=false",
                 "--browser.gatherUsageStats=false"]
     main()
 
