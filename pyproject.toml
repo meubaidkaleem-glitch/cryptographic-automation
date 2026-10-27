@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cryptographic-automation"
-version = "0.2.0"
-description = "Cryptographic automation workbench with encoding analysis, encryption, integrity, signatures and batch workflows"
+version = "0.3.0"
+description = "Professional cryptographic automation workbench with encoding analysis, protection, key management, batch workflows and audit reporting"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -19,7 +19,6 @@ dev = ["pytest>=8,<9"]
 
 [project.scripts]
 crypto-auto = "crypto_automation.cli:main"
-crypto-auto-app = "streamlit run app.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
