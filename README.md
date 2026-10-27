@@ -1,5 +1,83 @@
 # AutoCrypt
 
+## Download and install on Windows, macOS, and Linux
+
+AutoCrypt is currently distributed as source code; this repository does not yet publish native EXE, DMG, or Linux installer packages.
+
+### 1. Download the source
+
+- **ZIP (all operating systems):** [Download the latest source ZIP](https://github.com/meubaidkaleem-glitch/cryptographic-automation/archive/refs/heads/main.zip), then extract it.
+- **Git:** install Git from https://git-scm.com/downloads, then run:
+
+```bash
+git clone https://github.com/meubaidkaleem-glitch/cryptographic-automation.git
+cd cryptographic-automation
+```
+
+Install Python 3.11 or newer from https://www.python.org/downloads/ if it is not already installed.
+
+### 2. Windows 10/11
+
+Open PowerShell in the extracted project folder:
+
+```powershell
+py -3 -m venv .venv
+.venv\\Scripts\\Activate.ps1
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+streamlit run app.py
+```
+
+If PowerShell activation is blocked, use Command Prompt instead and activate with `.venv\\Scripts\\activate.bat`. When installing Python on Windows, enable the option to add Python to PATH if offered.
+
+### 3. macOS
+
+Open Terminal in the project folder:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e '.[dev]'
+streamlit run app.py
+```
+
+If a dependency requires Apple's command-line developer tools, install them with `xcode-select --install` and retry.
+
+### 4. Linux (Ubuntu/Debian example)
+
+Install Python and virtual-environment support, then set up AutoCrypt:
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip git
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e '.[dev]'
+streamlit run app.py
+```
+
+Use Python 3.11 or newer. Other Linux distributions may use a different package manager and package names.
+
+### 5. Docker (Windows, macOS, or Linux)
+
+Install Docker Desktop (Windows/macOS) or Docker Engine (Linux), then run these commands from the project folder:
+
+```bash
+docker build -t autocrypt .
+docker run --rm -p 8501:8501 autocrypt
+```
+
+Open http://localhost:8501 in your browser.
+
+### 6. Open AutoCrypt
+
+After the final command, open the local URL printed in the terminal (usually http://localhost:8501). Keep the terminal open while using the app; press Ctrl+C there to stop it. See the [official Streamlit installation guide](https://docs.streamlit.io/get-started/installation/command-line) for more environment details.
+
+---
+
+
 **AutoCrypt** is a local-first professional cryptographic automation workbench combining a multi-tab Streamlit application, terminal tooling, automatic encoding/sample analysis, an encrypted development key vault, batch execution, and structured audit reporting.
 
 ## What AutoCrypt does
