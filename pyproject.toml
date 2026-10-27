@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cryptographic-automation"
-version = "0.1.0"
-description = "Security-focused automation for common cryptographic workflows"
+version = "0.2.0"
+description = "Cryptographic automation workbench with encoding analysis, encryption, integrity, signatures and batch workflows"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
   "cryptography>=43,<48",
   "PyYAML>=6.0,<7",
+  "streamlit>=1.38,<2",
 ]
 
 [project.optional-dependencies]
@@ -18,6 +19,7 @@ dev = ["pytest>=8,<9"]
 
 [project.scripts]
 crypto-auto = "crypto_automation.cli:main"
+crypto-auto-app = "streamlit run app.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
